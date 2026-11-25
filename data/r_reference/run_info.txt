@@ -1,0 +1,6 @@
+R              4.5.2
+DESeq2         1.50.2
+genes_before   6000
+genes_after    5857
+design         ~ group
+contrast       WT_Cold vs WT_NoCold
