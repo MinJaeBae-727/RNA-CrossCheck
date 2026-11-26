@@ -34,3 +34,16 @@ cat("counts     ", nrow(counts), "x", ncol(counts), "\n")
 cat("after filter", dds@metadata$filter$n_after, "genes\n")
 cat("results    ", nrow(res), "rows,", ncol(res), "cols\n")
 cat("columns    ", paste(names(res), collapse = ", "), "\n")
+
+# --- variance stabilising transform and PCA, for the Python cross-check ---
+vsd <- DESeq2::vst(dds, blind = TRUE)
+write.csv(data.frame(gene_id = rownames(SummarizedExperiment::assay(vsd)),
+                     SummarizedExperiment::assay(vsd), check.names = FALSE),
+          file.path(out, "vst.csv"), row.names = FALSE)
+
+pca <- DESeq2::plotPCA(vsd, intgroup = "group", returnData = TRUE)
+pv <- round(100 * attr(pca, "percentVar"))
+write.csv(data.frame(sample = rownames(pca), PC1 = pca$PC1, PC2 = pca$PC2,
+                     group = pca$group, pc1_percent = pv[1], pc2_percent = pv[2]),
+          file.path(out, "pca.csv"), row.names = FALSE)
+cat("vst + pca written\n")
